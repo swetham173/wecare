@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -69,6 +70,7 @@ fun LoginScreen (navController: NavController, vm: LCViewmodel){
             OutlinedTextField(value = passwordState.value,
                 onValueChange = { newValue-> passwordState.value = newValue},
                 label={ Text(text = "Password")},
+                visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.padding(8.dp)
             )
 

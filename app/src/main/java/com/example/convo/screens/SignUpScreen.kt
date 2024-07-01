@@ -26,6 +26,7 @@ import com.google.android.gms.common.util.CollectionUtils.listOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import com.google.android.gms.common.util.CollectionUtils
 
 
@@ -102,6 +103,7 @@ fun SignUpScreen(navController: NavController, vm: LCViewmodel) {
             OutlinedTextField(value = passwordState.value,
             onValueChange = { newValue-> passwordState.value = newValue},
             label={ Text(text = "Password")},
+                visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.padding(8.dp)
         )
                 OutlinedTextField(
