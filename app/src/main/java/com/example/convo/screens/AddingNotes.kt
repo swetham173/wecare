@@ -1,5 +1,6 @@
 package com.example.convo.screens
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -98,14 +99,16 @@ fun AddingNotes(navController: NavController,vm:LCViewmodel,titlee:String,descri
                 // Save Button
                 Button(
                     onClick = {
-                        if (noteId=="") {
+                        Log.d("AddingNotes", "Generated/Provided Note ID: $noteId")
+
+                        if (noteID.isBlank()) {
                             vm.addNote(
                                 title = title.value,
                                 content = description.value,
                                 userId = userId ?: "",
                                 noteId = noteId
                             )
-                        } else {
+                        } else{
                             vm.addNote(
                                 title = title.value,
                                 content = description.value,
@@ -126,4 +129,5 @@ fun AddingNotes(navController: NavController,vm:LCViewmodel,titlee:String,descri
 }
  fun generateNoteId(): String {
     return UUID.randomUUID().toString()
+
 }

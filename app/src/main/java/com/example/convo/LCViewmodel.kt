@@ -730,6 +730,8 @@ class LCViewmodel @Inject constructor(
                     content = content,
                     timestamp = time
                 )
+                Log.d("LCViewmodel", "Current User: $currentUser")
+                Log.d("LCViewmodel", "Note ID: $noteId")
                 val userNoteRef =
                     db.collection("notes").document(userId).collection("TD").document(noteId)
                 userNoteRef.get()

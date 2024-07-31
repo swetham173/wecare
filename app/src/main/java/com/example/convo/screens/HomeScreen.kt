@@ -26,8 +26,8 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.convo.Dest
 import com.example.convo.LCViewmodel
-import com.google.android.gms.common.util.CollectionUtils
 import com.example.convo.R
+import com.google.android.gms.common.util.CollectionUtils
 @Composable
 fun HomeScreen(navController: NavController,vm:LCViewmodel) {
     val comicSansFontFamily = FontFamily(
@@ -46,7 +46,8 @@ fun HomeScreen(navController: NavController,vm:LCViewmodel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(6.dp).background(gradient)
+                .padding(6.dp)
+                .background(gradient)
         ) {
             Row(
                 modifier = Modifier
