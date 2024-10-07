@@ -1,5 +1,7 @@
 package com.example.convo.screens
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
@@ -21,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
@@ -134,22 +137,40 @@ fun CameraSelectionCard(
     capturedImageUri: MutableState<Uri?>,
     modifier: Modifier = Modifier
 ) {
+    val cameraPermission = Manifest.permission.CAMERA
+    val permissionGranted = remember { mutableStateOf(false) }
+
+    // Permission launcher to request the CAMERA permission
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        permissionGranted.value = isGranted
+        if (!isGranted) {
+            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Check if permission is granted initially
+    LaunchedEffect(Unit) {
+        permissionGranted.value = ContextCompat.checkSelfPermission(
+            context, cameraPermission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
     val gradient = Brush.linearGradient(
         colors = CollectionUtils.listOf(
             colorResource(id = R.color.LightBLue),
             colorResource(id = R.color.StrongPink)
-
         )
     )
-    Box(modifier=Modifier.height(200.dp)) {}
+    Box(modifier = Modifier.height(200.dp)) {}
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp)
             .border(BorderStroke(5.dp, Color.Black), shape = RoundedCornerShape(16.dp))
-            .background(gradient)
-        ,
+            .background(gradient),
         shape = RoundedCornerShape(8.dp),
         elevation = 4.dp
     ) {
@@ -159,26 +180,29 @@ fun CameraSelectionCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(onClick = {
-                val photoFile: File? = try {
-                    createImageFile(context)
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                    null
-                }
+                if (permissionGranted.value) {
+                    // If permission is already granted, proceed to take a picture
+                    val photoFile: File? = try {
+                        createImageFile(context)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                        null
+                    }
 
-                if (photoFile != null) {
-                    //FileProvider.getUriForFile generates a content URI for the created file.
-                    // This URI is necessary to give the camera app permission to write to the file.
-                    val photoURI: Uri = FileProvider.getUriForFile(
-                        context,
-                        "${context.packageName}.provider",
-                        photoFile
-                    )
-                    capturedImageUri.value = photoURI
-                    takePicture.launch(photoURI)
+                    if (photoFile != null) {
+                        val photoURI: Uri = FileProvider.getUriForFile(
+                            context,
+                            "${context.packageName}.provider",
+                            photoFile
+                        )
+                        capturedImageUri.value = photoURI
+                        takePicture.launch(photoURI)
+                    } else {
+                        Toast.makeText(context, "Failed to create file", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    // Handle the error case where the file could not be created
-                    Toast.makeText(context, "Failed to create file", Toast.LENGTH_SHORT).show()
+                    // Request permission if it's not already granted
+                    permissionLauncher.launch(cameraPermission)
                 }
             }) {
                 Icon(
@@ -192,6 +216,7 @@ fun CameraSelectionCard(
         }
     }
 }
+
 
 @Composable
 fun CapturedImageCard(imageUri: Uri, onDeleteClicked: () -> Unit) {
@@ -216,7 +241,6 @@ fun CapturedImageCard(imageUri: Uri, onDeleteClicked: () -> Unit) {
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
             ) {
-                // Replace R.drawable.ic_delete with your actual delete icon drawable
                 Icon(
                     painter = painterResource(id = R.drawable.deleteicon),
                     contentDescription = "Delete",
